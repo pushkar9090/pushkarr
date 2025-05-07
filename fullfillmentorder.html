@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fulfillment Orders</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css"> <!-- Optional CSS for styling -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1em;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 6px 12px;
+            margin: 5px;
+        }
+
+            .back-link {
+            display: inline-block;
+            margin-bottom: 10px;
+            text-decoration: none;
+            background: #007BFF;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fulfillment Orders</h1>
+    <button onclick="addOrder()">Add Order</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Employee Name</th>
+                <th>Original Price</th>
+                <th>Sold Price</th>
+                <th>Quantity Sold</th>
+                <th>Total Revenue</th>
+            </tr>
+        </thead>
+        <tbody id="orderTable">
+            <!-- Orders will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        function addOrder() {
+            const productName = prompt("Enter Product Name:");
+            const employeeName = prompt("Enter Employee Name:");
+            const originalPrice = parseFloat(prompt("Enter Original Price:"));
+            const soldPrice = parseFloat(prompt("Enter Sold Price:"));
+            const quantity = parseInt(prompt("Enter Quantity Sold:"));
+
+            if (
+                productName && employeeName &&
+                !isNaN(originalPrice) && !isNaN(soldPrice) && !isNaN(quantity)
+            ) {
+                const totalRevenue = soldPrice * quantity;
+                const order = {
+                    productName,
+                    employeeName,
+                    originalPrice,
+                    soldPrice,
+                    quantity,
+                    totalRevenue
+                };
+
+                const orders = JSON.parse(localStorage.getItem("fulfillmentOrders")) || [];
+                orders.push(order);
+                localStorage.setItem("fulfillmentOrders", JSON.stringify(orders));
+                displayOrders();
+            } else {
+                alert("Please enter valid values.");
+            }
+        }
+
+        function displayOrders() {
+            const orders = JSON.parse(localStorage.getItem("fulfillmentOrders")) || [];
+            const table = document.getElementById("orderTable");
+            table.innerHTML = ""; // Clear existing rows
+
+            orders.forEach(order => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${order.productName}</td>
+                    <td>${order.employeeName}</td>
+                    <td>${order.originalPrice.toFixed(2)}</td>
+                    <td>${order.soldPrice.toFixed(2)}</td>
+                    <td>${order.quantity}</td>
+                    <td>${order.totalRevenue.toFixed(2)}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        window.onload = displayOrders;
+    </script>
+</body>
+</html>

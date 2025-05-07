@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Optional external CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1em;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 6px 10px;
+            margin: 2px;
+            cursor: pointer;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Inventory Management</h1>
+    <button onclick="addInventoryItem()">Add Product</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Original Price</th>
+                <th>Selling Price</th>
+                <th>Quantity</th>
+                <th>Product Code</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTable">
+            <!-- Inventory rows will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        function addInventoryItem() {
+            const name = prompt("Enter Product Name:");
+            const originalPrice = parseFloat(prompt("Enter Original Price:"));
+            const sellingPrice = parseFloat(prompt("Enter Selling Price:"));
+            const quantity = parseInt(prompt("Enter Quantity:"));
+            const code = prompt("Enter Product Code:");
+
+            if (
+                name && !isNaN(originalPrice) &&
+                !isNaN(sellingPrice) && !isNaN(quantity) &&
+                code
+            ) {
+                const product = {
+                    name,
+                    originalPrice,
+                    sellingPrice,
+                    quantity,
+                    code
+                };
+
+                const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+                inventory.push(product);
+                localStorage.setItem("inventory", JSON.stringify(inventory));
+                displayInventory();
+            } else {
+                alert("Please enter all fields with valid values.");
+            }
+        }
+
+        function displayInventory() {
+            const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+            const table = document.getElementById("inventoryTable");
+            table.innerHTML = "";
+
+            inventory.forEach((item, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.originalPrice.toFixed(2)}</td>
+                    <td>${item.sellingPrice.toFixed(2)}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.code}</td>
+                    <td class="action-buttons">
+                        <button onclick="editItem(${index})">Edit</button>
+                        <button onclick="deleteItem(${index})">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function editItem(index) {
+            const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+            const item = inventory[index];
+
+            const name = prompt("Edit Product Name:", item.name);
+            const originalPrice = parseFloat(prompt("Edit Original Price:", item.originalPrice));
+            const sellingPrice = parseFloat(prompt("Edit Selling Price:", item.sellingPrice));
+            const quantity = parseInt(prompt("Edit Quantity:", item.quantity));
+            const code = prompt("Edit Product Code:", item.code);
+
+            if (
+                name && !isNaN(originalPrice) &&
+                !isNaN(sellingPrice) && !isNaN(quantity) &&
+                code
+            ) {
+                inventory[index] = { name, originalPrice, sellingPrice, quantity, code };
+                localStorage.setItem("inventory", JSON.stringify(inventory));
+                displayInventory();
+            } else {
+                alert("Please enter all fields with valid values.");
+            }
+        }
+
+        function deleteItem(index) {
+            const inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+            if (confirm("Are you sure you want to delete this product?")) {
+                inventory.splice(index, 1);
+                localStorage.setItem("inventory", JSON.stringify(inventory));
+                displayInventory();
+            }
+        }
+
+        window.onload = displayInventory;
+    </script>
+</body>
+</html>

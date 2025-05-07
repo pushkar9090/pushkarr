@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Sales Dashboard</h2>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="incentivecalculator.html">Incentive calculator</a></li>
+            <li><a href="leaderboard.html">Leaderboard</a></li>
+            <li><a href="recententries.html">Recent Entries</a></li>
+            <li><a href="inventory.html">Inventory</a></li>
+            <li><a href="fullfillmentorder.html">Orders completed</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="topbar">
+            <input type="text" placeholder="Search...">
+            <i class="fas fa-user-circle fa-2x"></i>
+        </div>
+        <h1>Dashboard</h1>
+        <div class="table-container">
+            <h2>User Management</h2>
+            <button onclick="addUser()">Insert User</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Orders</th>
+                        <th>Sales</th>
+                        <th>Month</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                    <tr>
+                        <td>Pushkar</td>
+                        <td>Owner</td>
+                        <td><span style="color:green">Active</span></td>
+                        <td>120</td>
+                        <td>224532</td>
+                        <td>April</td>
+                        <td>
+                            <button onclick="editUser(this)">Edit</button>
+                            <button onclick="deleteUser(this)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function addUser() {
+            let name = prompt("Enter Name:");
+            let role = prompt("Enter Role:");
+            let status = prompt("Enter Status (Active/Inactive):");
+            let orders = prompt("Enter Orders:");
+            let sales = prompt("Enter Sales:");
+            let month = prompt("Enter Month:");
+            
+            if (name && role && status && orders && sales && month) {
+                let table = document.getElementById("userTable");
+                let row = table.insertRow();
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${role}</td>
+                    <td><span style="color:${status.toLowerCase() === 'active' ? 'green' : 'red'}">${status}</span></td>
+                    <td>${orders}</td>
+                    <td>${sales}</td>
+                    <td>${month}</td>
+                    <td>
+                        <button onclick="editUser(this)">Edit</button>
+                        <button onclick="deleteUser(this)">Delete</button>
+                    </td>
+                `;
+                let users = JSON.parse(localStorage.getItem("users")) || [];
+                users.push({ name, role, status, orders, sales: parseFloat(sales), month, addedAt: new Date().toISOString() });
+        localStorage.setItem("users", JSON.stringify(users));
+            }
+        }    
+
+        function editUser(button) {
+            const row = button.parentElement.parentElement;
+    const index = row.rowIndex - 1; 
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+            let name = prompt("Edit Name:", row.cells[0].innerText);
+            let role = prompt("Edit Role:", row.cells[1].innerText);
+            let status = prompt("Edit Status:", row.cells[2].innerText);
+            let orders = prompt("Edit Orders:", row.cells[3].innerText);
+            let sales = prompt("Edit Sales:", row.cells[4].innerText);
+            let month = prompt("Edit Month:", row.cells[5].innerText);
+
+            if (name && role && status && orders && sales && month) {
+                row.cells[0].innerText = name;
+                row.cells[1].innerText = role;
+                row.cells[2].innerHTML = `<span style="color:${status.toLowerCase() === 'active' ? 'green' : 'red'}">${status}</span>`;
+                row.cells[3].innerText = orders;
+                row.cells[4].innerText = `${sales}`;
+                row.cells[5].innerText = month;
+
+                users[index] = { name, role, status, orders, sales: parseFloat(sales), month };
+        localStorage.setItem("users", JSON.stringify(users));
+            }
+        }
+
+        function deleteUser(button) {
+            let row = button.parentElement.parentElement;
+            let index = row.rowIndex - 1;
+            row.remove();
+
+            let users = JSON.parse(localStorage.getItem("users")) || [];
+    users.splice(index, 1);
+    localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        function loadUsers() {
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const table = document.getElementById("userTable");
+
+    users.forEach(user => {
+        let row = table.insertRow();
+        row.innerHTML = `
+            <td>${user.name}</td>
+            <td>${user.role}</td>
+            <td><span style="color:${user.status.toLowerCase() === 'active' ? 'green' : 'red'}">${user.status}</span></td>
+            <td>${user.orders}</td>
+            <td>${user.sales}</td>
+            <td>${user.month}</td>
+            <td>
+                <button onclick="editUser(this)">Edit</button>
+                <button onclick="deleteUser(this)">Delete</button>
+            </td>
+        `;
+    });
+}
+
+window.onload = function () {
+    loadUsers();
+};
+    </script>
+</body>
+</html>
